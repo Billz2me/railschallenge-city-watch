@@ -1,24 +1,29 @@
 class EmergenciesController < ApplicationController
 
-  before_filter :permit_parameters
-
   # Public: POST /emergencies
   def create
-    @emergency = Emergency.new(@permitted_parameters)
+    @emergency = Emergency.new(permitted_parameters)
 
     if @emergency.valid? && @emergency.save
       render @emergency, status: :created
     else
-      render json: { message: @emergency.errors }, status: :unprocessable_entity
+      render_exception_message(@emergency.errors, :unprocessable_entity)
     end
+  end
+
+  # Public: GET /emergencies/:code  
+  def show
+    render Emergency.find(params[:code])
   end
 
   private
 
-  def permit_parameters
-    @permitted_parameters = params.require(:emergency).permit(:code, :fire_severity, :police_severity, :medical_severity)
-  rescue ActionController::UnpermittedParameters => e
-    render json: { message: e.message }, status: :unprocessable_entity
+  # Internal: Mass assignment protection by permitting URL parameters. 
+  #
+  # Raises ActionController::UnpermittedParameters.
+  # Returns an ActionController::Parameter that acts like a Hash containing the permitted keys. 
+  def permitted_parameters
+    params.require(:emergency).permit(:code, :fire_severity, :police_severity, :medical_severity)
   end
 
 end
