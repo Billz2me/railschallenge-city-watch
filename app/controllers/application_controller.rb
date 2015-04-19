@@ -25,5 +25,4 @@ class ApplicationController < ActionController::Base
   def render_errors(error, status_code = :unprocessable_entity)
     render json: { message: error }, status: status_code
   end
-
 end
