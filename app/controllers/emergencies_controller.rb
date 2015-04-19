@@ -3,7 +3,7 @@ class EmergenciesController < ApplicationController
 
   # Public: GET /emergencies
   def index
-    render json: { emergencies: Emergency.all }
+    @emergencies = Emergency.all
   end
 
   # Public: POST /emergencies
@@ -13,7 +13,7 @@ class EmergenciesController < ApplicationController
     if @emergency.valid? && @emergency.save
       render @emergency, status: :created
     else
-      render_exception_message(@emergency.errors, :unprocessable_entity)
+      render_errors @emergency.errors
     end
   end
 
@@ -29,7 +29,7 @@ class EmergenciesController < ApplicationController
     if @emergency.update_attributes(@permitted_parameters)
       render @emergency
     else
-      render_exception_message(@emergency.errors, :unprocessable_entity)
+      render_errors @emergency.errors
     end
   end
 

@@ -1,6 +1,11 @@
 class RespondersController < ApplicationController
   before_action :permit_parameters!, only: [:create, :update]
 
+  # Public: GET /responders
+  def index
+    @responders = Responder.all
+  end
+
   # Public: POST /responders
   def create
     @responder = Responder.new(@permitted_parameters)
@@ -8,16 +13,24 @@ class RespondersController < ApplicationController
     if @responder.valid? && @responder.save
       render @responder, status: :created
     else
-      render_exception_message(@responder.errors, :unprocessable_entity)
+      render_errors @responder.errors
     end
   end
 
   # Public: GET /responders/:name
   def show
+    render Responder.find(params[:name])
   end
 
   # Public: [PUT, PATCH] /responders/:name
   def update
+    @responder = Responder.find(params[:name])
+
+    if @responder.update_attributes(@permitted_parameters)
+      render @responder
+    else
+      render_errors @responder.errors
+    end
   end
 
   private
@@ -27,6 +40,13 @@ class RespondersController < ApplicationController
   # Raises ActionController::UnpermittedParameters.
   # Returns an ActionController::Parameter that acts like a Hash containing the permitted keys.
   def permit_parameters!
-    @permitted_parameters = params.require(:responder).permit(:type, :name, :capacity)
+    @permitted_parameters ||= begin
+      case action_name.to_sym
+      when :create
+        params.require(:responder).permit(:type, :name, :capacity)
+      else
+        params.require(:responder).permit(:on_duty)
+      end
+    end
   end
 end

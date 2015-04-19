@@ -1,6 +1,7 @@
 class Responder < ActiveRecord::Base
   # Disable Single table inheritance
   self.inheritance_column = :_type_disabled
+  self.primary_key = :name
 
   has_one :emergency
 
