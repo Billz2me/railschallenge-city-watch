@@ -3,7 +3,11 @@ class RespondersController < ApplicationController
 
   # Public: GET /responders
   def index
-    @responders = Responder.all
+    if params[:show].eql?('capacity')
+      render json: { capacity: Responder.capacity_report }
+    else
+      @responders = Responder.all
+    end
   end
 
   # Public: POST /responders

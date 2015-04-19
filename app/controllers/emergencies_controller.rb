@@ -4,6 +4,7 @@ class EmergenciesController < ApplicationController
   # Public: GET /emergencies
   def index
     @emergencies = Emergency.all
+    @full_responses = [Emergency.full_response.count, Emergency.count]
   end
 
   # Public: POST /emergencies
@@ -11,7 +12,7 @@ class EmergenciesController < ApplicationController
     @emergency = Emergency.new(@permitted_parameters)
 
     if @emergency.valid? && @emergency.save
-      EmergencyDispatcher.new(@emergency).dispatch_to(Responder.on_duty.with_capacity)
+      @emergency.dispatch_to(Responder.on_duty.with_capacity)
       render @emergency, status: :created
     else
       render_errors @emergency.errors

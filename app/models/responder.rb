@@ -1,4 +1,9 @@
 class Responder < ActiveRecord::Base
+  include ResponderCapacityReport
+
+  # Public: Constant - a list of possible Responder types.
+  TYPES = %w( Fire Police Medical )
+
   # Disable STI
   self.inheritance_column = :_type_disabled
   self.primary_key = :name
@@ -22,4 +27,7 @@ class Responder < ActiveRecord::Base
   # Scope for Responders that have capacity greater than the provided capacity
   # Example: Responder.on_duty.with_capacity.where(...)
   scope :with_capacity, ->(capacity = 0) { where('capacity > ?', capacity) }
+
+  # Scope for Responders who are not currently assigned to an emergency.
+  scope :available, -> { where(emergency_code: nil) }
 end

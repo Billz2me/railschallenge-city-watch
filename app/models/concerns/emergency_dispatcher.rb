@@ -1,12 +1,5 @@
-class EmergencyDispatcher
-  # Public: Constructor.
-  #
-  # emergency - An Emergency object that needs dispatched to.
-  #
-  # Returns a new instance of EmergencyDispatcher.
-  def initialize(emergency)
-    @emergency = emergency
-  end
+module EmergencyDispatcher
+  extend ActiveSupport::Concern
 
   # Public: Dispatch available responders to the @emergency.
   #
@@ -17,11 +10,11 @@ class EmergencyDispatcher
   #
   # Returns a subset of available_responders that were dispatched the @emergency.
   def dispatch_to(available_responders)
-    if available_responders.any?
-      chosen_responders = select_responders_from(available_responders)
-      @emergency.update_attribute(:full_response, severity_fulfilled_by?(chosen_responders))
-      @emergency.responders << chosen_responders.values.flatten
-    end
+    return if available_responders.none?
+
+    chosen_responders = select_responders_from(available_responders)
+    update_attribute(:full_response, severity_fulfilled_by?(chosen_responders))
+    responders << chosen_responders.values.flatten
   end
 
   private
@@ -29,9 +22,7 @@ class EmergencyDispatcher
   # Internal: Determine if the severity need was fulfilled by the capacity of the responders.
   # Return a boolean true if the severity was met by the capacity.
   def severity_fulfilled_by?(chosen_responders)
-    @emergency.severities.all? do |type, level|
-      chosen_responders[type].sum(&:capacity) >= level
-    end
+    severities.all? { |type, level| chosen_responders[type].sum(&:capacity) >= level }
   end
 
   # Internal: Determine the responders to dispatch.
@@ -41,11 +32,11 @@ class EmergencyDispatcher
   # Returns a Hash of type { severity_type: [Responders] }
   def select_responders_from(available_responders)
     chosen_responders = {}
-    @emergency.severities.each do |severity_type, severity_level|
-      chosen_responders[severity_type] = select_responders_to_fulfill_severity(severity_level, severity_type, available_responders)
+    severities.each do |severity_type, severity_level|
+      chosen_responders[severity_type] = responders_for(severity_level, severity_type, available_responders)
     end
     chosen_responders
- end
+  end
 
   # Public: Select which responders should be chosen to fulfill the given severity level.
   #
@@ -58,18 +49,29 @@ class EmergencyDispatcher
   #    3. If there are no responders whose capacity is lower, just take the one with the most capacity.
   #
   # Returns a subset list of responders.
-  def select_responders_to_fulfill_severity(severity_level, severity_type, responders)
+  def responders_for(severity_level, severity_type, responders)
     chosen_responders = []
 
     correct_type_responders = responders.select { |responder| responder.type.eql?(severity_type.to_s.titleize) }
     sorted_responders = correct_type_responders.sort_by(&:capacity).reverse
 
     until severity_level <= 0 || sorted_responders.empty?
-      chosen_responder = sorted_responders.find { |responder| responder.capacity <= severity_level } || sorted_responders.first
-      chosen_responders << sorted_responders.delete(chosen_responder)
-      severity_level -= chosen_responder.capacity
+      responder = choose_responder(severity_level, sorted_responders)
+      chosen_responders << sorted_responders.delete(responder)
+      severity_level -= responder.capacity
     end
 
     chosen_responders
+  end
+
+  # Internal: Choose a responder from a list of sorted responders.
+  #
+  # severity_level - The severity level that the chosen responder should try to satisfy.
+  # sorted_responders - A list of Responder, sorted by capacity from highest to lowest.
+  #
+  # Returns a Responder from the list.
+  def choose_responder(severity_level, sorted_responders)
+    chosen_responder = sorted_responders.find { |responder| responder.capacity <= severity_level }
+    chosen_responder || sorted_responders.first
   end
 end

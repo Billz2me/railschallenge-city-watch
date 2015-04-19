@@ -25,6 +25,8 @@ ActiveRecord::Schema.define(version: 20150418225454) do
   end
 
   add_index "emergencies", ["code"], name: "index_emergencies_on_code", unique: true
+  add_index "emergencies", ["full_response"], name: "index_emergencies_on_full_response"
+  add_index "emergencies", ["resolved_at"], name: "index_emergencies_on_resolved_at"
 
   create_table "responders", force: :cascade do |t|
     t.string   "name",                           null: false
@@ -36,6 +38,9 @@ ActiveRecord::Schema.define(version: 20150418225454) do
     t.datetime "updated_at",                     null: false
   end
 
+  add_index "responders", ["capacity"], name: "index_responders_on_capacity"
+  add_index "responders", ["emergency_code"], name: "index_responders_on_emergency_code"
   add_index "responders", ["name"], name: "index_responders_on_name", unique: true
+  add_index "responders", ["on_duty"], name: "index_responders_on_on_duty"
 
 end

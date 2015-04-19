@@ -11,5 +11,7 @@ class CreateEmergencies < ActiveRecord::Migration
     end
 
     add_index(:emergencies, :code, unique: true)
+    add_index(:emergencies, :full_response)
+    add_index(:emergencies, :resolved_at, using: 'btree')
   end
 end
