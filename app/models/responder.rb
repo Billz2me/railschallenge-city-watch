@@ -1,12 +1,12 @@
 class Responder < ActiveRecord::Base
   include ResponderCapacityReport
 
-  # Public: Constant - a list of possible Responder types.
-  TYPES = %w( Fire Police Medical )
-
   # Disable STI
   self.inheritance_column = :_type_disabled
   self.primary_key = :name
+
+  # Public: Constant - a list of possible Responder types.
+  TYPES = %w( Fire Police Medical )
 
   has_one :emergency
 
@@ -20,14 +20,12 @@ class Responder < ActiveRecord::Base
             presence: true,
             inclusion: 1..5
 
-  # Scope for Responders that are on duty.
-  # Example: Responder.on_duty.where(...)
+  # Public: Scope for Responders that are on duty.
   scope :on_duty, -> { where(on_duty: true) }
 
-  # Scope for Responders that have capacity greater than the provided capacity
-  # Example: Responder.on_duty.with_capacity.where(...)
+  # Public: Scope for Responders that have capacity greater than the provided capacity.
   scope :with_capacity, ->(capacity = 0) { where('capacity > ?', capacity) }
 
-  # Scope for Responders who are not currently assigned to an emergency.
+  # Public: Scope for Responders who are not currently assigned to an emergency.
   scope :available, -> { where(emergency_code: nil) }
 end

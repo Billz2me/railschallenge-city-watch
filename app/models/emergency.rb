@@ -1,9 +1,9 @@
 class Emergency < ActiveRecord::Base
   include EmergencyDispatcher
 
-  after_update :release_responders, if: :resolved?
-
   self.primary_key = :code
+
+  after_update :release_responders, if: :resolved?
 
   has_many :responders, foreign_key: :emergency_code
 
@@ -15,8 +15,7 @@ class Emergency < ActiveRecord::Base
             presence: true,
             numericality: { only_integer: true, greater_than_or_equal_to: 0 }
 
-  # Scope for Emergency that had a full_response.
-  # Example: Emergency.full_response.count
+  # Public: Scope for emergencies that had a full response.
   scope :full_response, -> { where(full_response: true) }
 
   # Public: Get all severities in a Hash.

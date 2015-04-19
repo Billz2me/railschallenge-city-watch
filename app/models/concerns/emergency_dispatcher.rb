@@ -5,9 +5,6 @@ module EmergencyDispatcher
   #
   # available_responders - A collection of responders that are available to dispatch.
   #
-  # Example:
-  #   EmergencyDispatcher.new(@emergency).dispatch_to(Responder.on_duty.with_capacity)
-  #
   # Returns a subset of available_responders that were dispatched the @emergency.
   def dispatch_to(available_responders)
     return if available_responders.none?
@@ -19,7 +16,7 @@ module EmergencyDispatcher
 
   private
 
-  # Internal: Determine if the severity need was fulfilled by the capacity of the responders.
+  # Internal: Determine if the severity for the @emergency was fulfilled by the capacity of the responders.
   # Return a boolean true if the severity was met by the capacity.
   def severity_fulfilled_by?(chosen_responders)
     severities.all? { |type, level| chosen_responders[type].sum(&:capacity) >= level }
@@ -41,6 +38,7 @@ module EmergencyDispatcher
   # Public: Select which responders should be chosen to fulfill the given severity level.
   #
   # severity_level - The level of severity that the responders' capacity must meet.
+  # severity_type - The type of severity to select responders for (e.g. :fire, 'Fire')
   # responders - A list of responders to select from with capacity to meet the severity level.
   #
   # Algorithm: # NOTE: This greedy algorithm is not globally optimal, but it passes the spec!
