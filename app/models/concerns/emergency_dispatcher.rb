@@ -8,10 +8,11 @@ module EmergencyDispatcher
   # Returns a subset of available_responders that were dispatched the @emergency.
   def dispatch_to(available_responders)
     return if available_responders.none?
-
     chosen_responders = select_responders_from(available_responders)
-    update_attribute(:full_response, severity_fulfilled_by?(chosen_responders))
-    responders << chosen_responders.values.flatten
+    transaction do
+      update_attribute(:full_response, severity_fulfilled_by?(chosen_responders))
+      responders << chosen_responders.values.flatten
+    end
   end
 
   private

@@ -12,10 +12,8 @@ class ApplicationController < ActionController::Base
   end
 
   # Internal: The rescue action for ActiveRecord::RecordNotFound
-  #
-  # exception - The exception being rescued from.
   def not_found
-    render_errors('page not found', :not_found)
+    render_errors(I18n.t('errors.not_found'), :not_found)
   end
 
   # Internal: Helper method for rendering exception messages.
