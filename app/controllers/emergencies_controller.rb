@@ -11,6 +11,7 @@ class EmergenciesController < ApplicationController
     @emergency = Emergency.new(@permitted_parameters)
 
     if @emergency.valid? && @emergency.save
+      EmergencyDispatcher.new(@emergency).dispatch_to(Responder.on_duty.with_capacity)
       render @emergency, status: :created
     else
       render_errors @emergency.errors
