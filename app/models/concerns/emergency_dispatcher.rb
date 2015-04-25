@@ -42,11 +42,6 @@ module EmergencyDispatcher
   # severity_type - The type of severity to select responders for (e.g. :fire, 'Fire')
   # responders - A list of responders to select from with capacity to meet the severity level.
   #
-  # Algorithm: # NOTE: This greedy algorithm is not globally optimal, but it passes the spec!
-  #    1. Sort the responders by their capacity form highest to lowest.
-  #    2. Scan the responders and select the first one that has capacity lower than the severity.
-  #    3. If there are no responders whose capacity is lower, just take the one with the most capacity.
-  #
   # Returns a subset list of responders.
   def responders_for(severity_level, severity_type, responders)
     chosen_responders = []

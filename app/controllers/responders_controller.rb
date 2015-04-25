@@ -14,7 +14,7 @@ class RespondersController < ApplicationController
   def create
     @responder = Responder.new(@permitted_parameters)
 
-    if @responder.valid? && @responder.save
+    if @responder.save
       render @responder, status: :created
     else
       render_errors @responder.errors
@@ -23,12 +23,12 @@ class RespondersController < ApplicationController
 
   # Public: GET /responders/:name
   def show
-    render Responder.find(params[:name])
+    render Responder.find_by!(name: params[:name])
   end
 
   # Public: [PUT, PATCH] /responders/:name
   def update
-    @responder = Responder.find(params[:name])
+    @responder = Responder.find_by!(name: params[:name])
 
     if @responder.update_attributes(@permitted_parameters)
       render @responder
@@ -48,7 +48,7 @@ class RespondersController < ApplicationController
       case action_name.to_sym
       when :create
         params.require(:responder).permit(:type, :name, :capacity)
-      else
+      when :update
         params.require(:responder).permit(:on_duty)
       end
     end

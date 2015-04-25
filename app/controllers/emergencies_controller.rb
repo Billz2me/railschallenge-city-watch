@@ -11,7 +11,7 @@ class EmergenciesController < ApplicationController
   def create
     @emergency = Emergency.new(@permitted_parameters)
 
-    if @emergency.valid? && @emergency.save
+    if @emergency.save
       @emergency.dispatch_to(Responder.on_duty.with_capacity)
       render @emergency, status: :created
     else
@@ -21,12 +21,12 @@ class EmergenciesController < ApplicationController
 
   # Public: GET /emergencies/:code
   def show
-    render Emergency.find(params[:code])
+    render Emergency.find_by!(code: params[:code])
   end
 
   # Public: [PUT, PATCH] /emergencies/:code
   def update
-    @emergency = Emergency.find(params[:code])
+    @emergency = Emergency.find_by!(code: params[:code])
 
     if @emergency.update_attributes(@permitted_parameters)
       render @emergency
@@ -46,7 +46,7 @@ class EmergenciesController < ApplicationController
       case action_name.to_sym
       when :create
         params.require(:emergency).permit(:code, :fire_severity, :police_severity, :medical_severity)
-      else
+      when :update
         params.require(:emergency).permit(:resolved_at, :fire_severity, :police_severity, :medical_severity)
       end
     end

@@ -1,8 +1,6 @@
 class Emergency < ActiveRecord::Base
   include EmergencyDispatcher
 
-  self.primary_key = :code
-
   after_update :release_responders, if: :resolved?
 
   has_many :responders, foreign_key: :emergency_code

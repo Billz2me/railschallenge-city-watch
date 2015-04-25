@@ -13,7 +13,7 @@
 
 ActiveRecord::Schema.define(version: 20150418225454) do
 
-  create_table "emergencies", id: false, force: :cascade do |t|
+  create_table "emergencies", force: :cascade do |t|
     t.string   "code",                             null: false
     t.integer  "fire_severity",                    null: false
     t.integer  "police_severity",                  null: false
